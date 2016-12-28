@@ -85,6 +85,12 @@ Usage
     },
     MULTISITE_CMS_FALLBACK='www.example.com'
 
+#. In project ``urls.py``::
+
+    #. Add ``from djangocms_multisite.urlresolvers import cms_multisite_url``
+    #. Change ``url(r'^', include('cms.urls')),`` to ``cms_multisite_url(r'^', include('cms.urls')),``
+
+
 #. Run ``python manage.py migrate``
 
 
