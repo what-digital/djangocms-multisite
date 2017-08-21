@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+import sys
 
 from django.conf import settings
 from django.conf.urls import url, include
@@ -21,6 +22,10 @@ else:
 class CMSMultisiteRegexURLResolver(RegexURLResolver):
     @property
     def url_patterns(self):
+        # Don't tweak anything if it's migration-related operation
+        if ('makemigrations' in sys.argv or 'migrate' in sys.argv):
+            return []
+
         site = Site.objects.get_current()
         try:
             return MULTISITE_PATTERNS[site]
