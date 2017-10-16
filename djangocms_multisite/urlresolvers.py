@@ -6,10 +6,12 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import RegexURLResolver
+from django.dispatch import receiver
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
 from cms.constants import SLUG_REGEXP
+from cms.signals import urls_need_reloading
 from cms.views import details
 
 MULTISITE_PATTERNS = {}
@@ -17,6 +19,12 @@ if settings.APPEND_SLASH:
     regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
 else:
     regexp = r'^(?P<slug>%s)$' % SLUG_REGEXP
+
+
+@receiver(urls_need_reloading, dispatch_uid='cms_clear_multisite_patterns')
+def clear_multisite_patterns(*args, **kwargs):
+    global MULTISITE_PATTERNS
+    MULTISITE_PATTERNS = {}
 
 
 class CMSMultisiteRegexURLResolver(RegexURLResolver):
@@ -28,7 +36,7 @@ class CMSMultisiteRegexURLResolver(RegexURLResolver):
 
         site = Site.objects.get_current()
         try:
-            return MULTISITE_PATTERNS[site]
+            return MULTISITE_PATTERNS[site.pk]
         except KeyError:
 
             if apphook_pool.get_apphooks():
@@ -43,8 +51,8 @@ class CMSMultisiteRegexURLResolver(RegexURLResolver):
                 url(regexp, details, name='pages-details-by-slug'),
                 url(r'^$', details, {'slug': ''}, name='pages-root'),
             ])
-            MULTISITE_PATTERNS[site] = urlpatterns
-        return MULTISITE_PATTERNS[site]
+            MULTISITE_PATTERNS[site.pk] = urlpatterns
+        return MULTISITE_PATTERNS[site.pk]
 
 
 def cms_multisite_url(regex, view, kwargs=None, name=None, prefix=''):
