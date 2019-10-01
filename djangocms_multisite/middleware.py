@@ -6,9 +6,10 @@ from django.conf import settings
 from django.urls import set_urlconf
 from django.utils.cache import patch_vary_headers
 from django.utils.six.moves import urllib_parse as urlparse
+from django.utils.deprecation import MiddlewareMixin
 
 
-class CMSMultiSiteMiddleware(object):
+class CMSMultiSiteMiddleware(MiddlewareMixin):
     def process_request(self, request):
         MULTISITE_CMS_URLS = getattr(settings, 'MULTISITE_CMS_URLS', {})
         MULTISITE_CMS_ALIASES = getattr(settings, 'MULTISITE_CMS_ALIASES', {})
