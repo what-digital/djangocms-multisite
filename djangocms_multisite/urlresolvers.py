@@ -5,7 +5,7 @@ import sys
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import RegexURLResolver
+from django.urls import URLResolver as RegexURLResolver
 from django.dispatch import receiver
 
 from cms.apphook_pool import apphook_pool
